@@ -1,0 +1,78 @@
+var front, back, mask, img, hole = 250;
+
+var bubbles = [];
+
+
+preload = () => {
+    //preload all images
+    front = loadImage("img/jelly.png");
+    back = loadImage("img/plastic.png");
+    circle = loadImage("img/circle.png");
+}
+
+setup = () => {
+    createCanvas(windowWidth, windowHeight);
+    
+    noCursor();
+    
+    back.resize(windowWidth, windowHeight);
+    
+    //create hole
+    //start of code from https://stackoverflow.com/questions/49715907/masking-or-clipping-mask-with-p5-js
+    img.mask(circle);
+    //end of code from https://stackoverflow.com/questions/49715907/masking-or-clipping-mask-with-p5-js 
+    
+    //create 19 bubble objects
+    for (var i = 0; i < 18; i++) {
+        bubbles[i] = {
+            h: windowHeight,
+            w: random(width),
+            size: random(10, 30),
+            speed: random(0.5, 3),
+            create: function() {
+                fill(255, 255, 255, 50);
+                noStroke();
+                ellipse(this.w, this.h, this.size, this.size);
+                },
+            float: function() {
+                this.h -= this.speed;
+                if (this.h < 0) {
+                    this.h = windowHeight;
+                }
+            }
+        }
+    }
+    
+    print(bubbles);
+}
+
+
+draw = () => {
+    background(front);
+    
+    //copy pixels around cursor location
+
+	  img.copy(back, mouseX - hole / 2, mouseY - hole / 2, hole, hole, 0, 0, hole, hole);
+    
+    
+    //mask hole to make it circular
+    img.mask(circle);
+    
+    
+    //draw copied image around cursor location over the background
+	  image(img, mouseX - hole / 2, mouseY - hole / 2, [hole], [hole]);
+    
+    if (mouseIsPressed) {
+        background(back);
+    }
+    
+    //create and animate bubbles
+    for (let i = 0; i < bubbles.length; i++) {
+        bubbles[i].create();
+        bubbles[i].float();
+    } 
+}
+
+windowResized = () => {
+    resizeCanvas(windowWidth, windowHeight);
+}
